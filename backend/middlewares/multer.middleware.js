@@ -1,9 +1,14 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "./media"); // Destination directory for storing files
+        const dir = "./media";
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir); // Destination directory for storing files
     },
     filename: function (req, file, cb) {
         let filename = "";
@@ -18,8 +23,7 @@ const storage = multer.diskStorage({
         } else if (req.body?.type === "material") {
             filename = `${req.body.title}_Subject_${req.body.subject}.pdf`;
         } else if (req.body?.type === "notice") {
-            filename = `Notice_${req.body.title}}.pdf`;
-            
+            filename = `Notice_${req.body.title}.pdf`;
         }
         cb(null, filename);
     }
@@ -28,4 +32,3 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 module.exports = upload;
-
